@@ -1,6 +1,7 @@
 package com.figueroa.readerapp.screens.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,6 +47,7 @@ import coil.request.ImageRequest
 import com.figueroa.readerapp.components.InputField
 import com.figueroa.readerapp.components.ReaderAppBar
 import com.figueroa.readerapp.model.Item
+import com.figueroa.readerapp.navigation.ReaderScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +83,14 @@ fun SearchScreen(navController: NavController, viewModel: BookSearchViewModel = 
 fun BookList(navController: NavController, viewModel: BookSearchViewModel = hiltViewModel()) {
     val listOfBooks = viewModel.list
     if (viewModel.isLoading) {
-        LinearProgressIndicator()
+        Row(
+            modifier = Modifier.padding(end = 2.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            LinearProgressIndicator()
+            Text(text = "Loading...")
+        }
     } else {
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
             items(items = listOfBooks) { book ->
@@ -94,7 +103,9 @@ fun BookList(navController: NavController, viewModel: BookSearchViewModel = hilt
 @Composable
 fun BookRow(book: Item, navController: NavController) {
     Card(
-        modifier = Modifier.clickable { }.fillMaxWidth().height(100.dp).padding(3.dp),
+        modifier = Modifier.clickable {
+            navController.navigate(ReaderScreens.DetailsScreen.name + "/${book.id}")
+        }.fillMaxWidth().height(100.dp).padding(3.dp),
         shape = RectangleShape,
         elevation = CardDefaults.cardElevation(7.dp),
         colors = CardDefaults.cardColors(Color.White),
