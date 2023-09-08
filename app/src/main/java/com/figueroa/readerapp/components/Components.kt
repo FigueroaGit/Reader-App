@@ -2,6 +2,7 @@ package com.figueroa.readerapp.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -159,27 +161,44 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
 @Composable
 fun ReaderAppBar(
     title: String,
+    icon: ImageVector? = null,
+    isHomeScreen: Boolean = true,
     navController: NavController,
+    onBackArrowClicked: () -> Unit = {},
 ) {
     TopAppBar(
         title = {
             Text(text = title, color = Color.Black)
         },
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Rounded.Menu,
-                    contentDescription = "Navigation Drawer Icon",
-                )
+            IconButton(onClick = { onBackArrowClicked.invoke() }) {
+                if (isHomeScreen) {
+                    Icon(
+                        imageVector = Icons.Rounded.Menu,
+                        contentDescription = "Navigation Drawer Icon",
+                    )
+                } else {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "Arrow Back",
+                            tint = Color.Black,
+                        )
+                    }
+                }
             }
         },
         actions = {
-            IconButton(onClick = {
-                FirebaseAuth.getInstance().signOut().run {
-                    navController.navigate(ReaderScreens.LoginScreen.name)
+            if (isHomeScreen) {
+                IconButton(onClick = {
+                    FirebaseAuth.getInstance().signOut().run {
+                        navController.navigate(ReaderScreens.LoginScreen.name)
+                    }
+                }) {
+                    Icon(imageVector = Icons.Rounded.Logout, contentDescription = "Logout")
                 }
-            }) {
-                Icon(imageVector = Icons.Rounded.Logout, contentDescription = "Logout")
+            } else {
+                Box {}
             }
         },
     )
@@ -262,7 +281,9 @@ fun ListCard(
         ) {
             Row(horizontalArrangement = Arrangement.Center) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data("http://bookcoverarchive.com/wp-content/uploads/2010/09/the_last_skin.large_.jpg").build(),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data("http://bookcoverarchive.com/wp-content/uploads/2010/09/the_last_skin.large_.jpg")
+                        .build(),
                     contentDescription = "Book Image",
                     modifier = Modifier
                         .height(140.dp)
@@ -295,7 +316,11 @@ fun ListCard(
                 modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.labelMedium,
             )
-            Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(start = 110.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(start = 110.dp),
+            ) {
                 RoundedButton("Reading", radius = 70)
             }
         }

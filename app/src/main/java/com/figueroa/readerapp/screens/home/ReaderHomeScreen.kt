@@ -46,7 +46,9 @@ fun Home(navController: NavController = NavController(LocalContext.current)) {
     Scaffold(topBar = {
         ReaderAppBar(title = "Reader", navController = navController)
     }, floatingActionButton = {
-        FABContent {}
+        FABContent {
+            navController.navigate(ReaderScreens.SearchScreen.name)
+        }
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             Surface(modifier = Modifier.fillMaxSize()) {

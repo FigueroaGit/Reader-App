@@ -1,6 +1,7 @@
 package com.figueroa.readerapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -8,6 +9,7 @@ import com.figueroa.readerapp.screens.ReaderSplashScreen
 import com.figueroa.readerapp.screens.details.BookDetailsScreen
 import com.figueroa.readerapp.screens.home.Home
 import com.figueroa.readerapp.screens.login.ReaderLoginScreen
+import com.figueroa.readerapp.screens.search.BookSearchViewModel
 import com.figueroa.readerapp.screens.search.SearchScreen
 import com.figueroa.readerapp.screens.stats.ReaderStatsScreen
 import com.figueroa.readerapp.screens.update.BookUpdateScreen
@@ -33,7 +35,8 @@ fun ReaderNavigation() {
         }
 
         composable(route = ReaderScreens.SearchScreen.name) {
-            SearchScreen(navController = navController)
+            val searchViewModel = hiltViewModel<BookSearchViewModel>()
+            SearchScreen(navController = navController, searchViewModel)
         }
 
         composable(route = ReaderScreens.ReaderStatsScreen.name) {
