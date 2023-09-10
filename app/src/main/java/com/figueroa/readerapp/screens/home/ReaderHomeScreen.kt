@@ -1,5 +1,6 @@
 package com.figueroa.readerapp.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.figueroa.readerapp.components.FABContent
 import com.figueroa.readerapp.components.ListCard
@@ -42,7 +44,10 @@ import com.google.firebase.auth.FirebaseAuth
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun Home(navController: NavController = NavController(LocalContext.current)) {
+fun Home(
+    navController: NavController = NavController(LocalContext.current),
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+) {
     Scaffold(topBar = {
         ReaderAppBar(title = "Reader", navController = navController)
     }, floatingActionButton = {
@@ -52,22 +57,32 @@ fun Home(navController: NavController = NavController(LocalContext.current)) {
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             Surface(modifier = Modifier.fillMaxSize()) {
-                HomeContent(navController = navController)
+                HomeContent(navController = navController, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun HomeContent(navController: NavController) {
-    val listOfBooks =
-        listOf(
-            MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
-            MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
-            MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
-            MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
-            MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
-        )
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = viewModel.data.value?.data!!.toList()!!.filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+        Log.d("Books", "HomeContent: $listOfBooks")
+    }
+
+    // val listOfBooks =
+    //     listOf(
+    //         MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
+    //         MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
+    //         MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
+    //         MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
+    //         MBook(id = "1234", title = "Hello Again", authors = "All of us", notes = null),
+    //     )
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserName =
         if (!email.isNullOrEmpty()) {
@@ -100,7 +115,6 @@ fun HomeContent(navController: NavController) {
             }
         }
         ReadingRightNowArea(books = listOf(), navController = navController)
-        ListCard()
         TitleSection(label = "Reading List")
         BookListArea(listOfBooks = listOfBooks, navController = navController)
     }
@@ -109,7 +123,7 @@ fun HomeContent(navController: NavController) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
     HorizontalScrollableComponent(listOfBooks) {
-        // Todo: On card clicked navigate to details
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
@@ -119,7 +133,7 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (Stri
     Row(modifier = Modifier.fillMaxWidth().heightIn(280.dp).horizontalScroll(scrollState)) {
         for (book in listOfBooks) {
             ListCard(book) {
-                onCardPressed(it)
+                onCardPressed(book.googleBookId.toString())
             }
         }
     }

@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.figueroa.readerapp.screens.ReaderSplashScreen
 import com.figueroa.readerapp.screens.details.BookDetailsScreen
 import com.figueroa.readerapp.screens.home.Home
+import com.figueroa.readerapp.screens.home.HomeScreenViewModel
 import com.figueroa.readerapp.screens.login.ReaderLoginScreen
 import com.figueroa.readerapp.screens.search.BookSearchViewModel
 import com.figueroa.readerapp.screens.search.SearchScreen
@@ -25,7 +26,8 @@ fun ReaderNavigation() {
         }
 
         composable(route = ReaderScreens.ReaderHomeScreen.name) {
-            Home(navController = navController)
+            val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
+            Home(navController = navController, viewModel = homeScreenViewModel)
         }
 
         val detailName = ReaderScreens.DetailsScreen.name
@@ -56,8 +58,18 @@ fun ReaderNavigation() {
             ReaderStatsScreen(navController = navController)
         }
 
-        composable(route = ReaderScreens.UpdateScreen.name) {
-            BookUpdateScreen(navController = navController)
+        val updateName = ReaderScreens.UpdateScreen.name
+        composable(
+            route = "$updateName/{bookItemId}",
+            arguments = listOf(
+                navArgument("bookItemId") {
+                    type = NavType.StringType
+                },
+            ),
+        ) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString("bookItemId").let {
+                BookUpdateScreen(navController = navController, bookItemId = it.toString())
+            }
         }
     }
 }

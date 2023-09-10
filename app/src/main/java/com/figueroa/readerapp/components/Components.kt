@@ -1,5 +1,11 @@
 package com.figueroa.readerapp.components
 
+import android.content.Context
+import android.view.MotionEvent
+import android.widget.Toast
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +27,7 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material.icons.rounded.StarRate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,11 +41,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -254,10 +267,9 @@ fun BookRating(score: Double = 4.5) {
     }
 }
 
-@Preview
 @Composable
 fun ListCard(
-    book: MBook = MBook("idgfgf", "Running", "Me and You", "Hello World"),
+    book: MBook,
     onPressDetails: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -282,7 +294,7 @@ fun ListCard(
             Row(horizontalArrangement = Arrangement.Center) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data("http://bookcoverarchive.com/wp-content/uploads/2010/09/the_last_skin.large_.jpg")
+                        .data(book.photoURL.toString())
                         .build(),
                     contentDescription = "Book Image",
                     modifier = Modifier
@@ -347,4 +359,50 @@ fun RoundedButton(label: String = "Reading", radius: Int = 29, onPress: () -> Un
             Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
         }
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun RatingBar(modifier: Modifier = Modifier, rating: Int, onPressRating: (Int) -> Unit) {
+    var ratingState by remember {
+        mutableStateOf(rating)
+    }
+    var selected by remember {
+        mutableStateOf(false)
+    }
+    val size by animateDpAsState(
+        targetValue = if (selected) 42.dp else 34.dp,
+        spring(Spring.DampingRatioMediumBouncy),
+    )
+
+    Row(
+        modifier = Modifier.width(280.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        for (i in 1..5) {
+            Icon(
+                imageVector = Icons.Rounded.StarRate,
+                contentDescription = "star",
+                modifier = modifier.width(size).height(size).pointerInteropFilter {
+                    when (it.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            selected = true
+                            onPressRating(i)
+                            ratingState = i
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            selected = false
+                        }
+                    }
+                    true
+                },
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+            )
+        }
+    }
+}
+
+fun showToast(context: Context, msg: String) {
+    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
 }

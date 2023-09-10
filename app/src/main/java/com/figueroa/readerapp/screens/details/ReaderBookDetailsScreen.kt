@@ -162,7 +162,7 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
                 pageCount = bookData.pageCount.toString(),
                 rating = 0.0,
                 googleBookId = googleBookId,
-                userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+                userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
             )
             saveToFirebase(book, navController)
         }
@@ -177,14 +177,13 @@ fun saveToFirebase(book: MBook, navController: NavController) {
     val database = FirebaseFirestore.getInstance()
     val databaseCollection = database.collection("books")
 
-    if(book.toString().isNotEmpty()) {
+    if (book.toString().isNotEmpty()) {
         databaseCollection.add(book).addOnSuccessListener { documentRef ->
             val documentId = documentRef.id
-            databaseCollection.document(documentId).update(hashMapOf("id" to documentId) as Map<String, Any>).addOnCompleteListener { task->
-                if(task.isSuccessful) {
+            databaseCollection.document(documentId).update(hashMapOf("id" to documentId) as Map<String, Any>).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     navController.popBackStack()
                 }
-
             }.addOnFailureListener {
                 Log.w("Error", "SaveToFirebase: Error updating doc", it)
             }

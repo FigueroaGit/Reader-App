@@ -2,7 +2,9 @@ package com.figueroa.readerapp.di
 
 import com.figueroa.readerapp.network.BooksAPI
 import com.figueroa.readerapp.repository.BookRepository
+import com.figueroa.readerapp.repository.FireRepository
 import com.figueroa.readerapp.utils.Constants.BASE_URL
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +16,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideFireBookRepository() = FireRepository(queryBook = FirebaseFirestore.getInstance().collection("books"))
 
     @Singleton
     @Provides
