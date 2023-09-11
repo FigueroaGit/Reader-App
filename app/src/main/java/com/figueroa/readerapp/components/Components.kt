@@ -76,7 +76,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun ReaderLogo(modifier: Modifier = Modifier) {
     Text(
         text = "Reader",
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = modifier.padding(top = 46.dp, bottom = 16.dp),
         style = MaterialTheme.typography.headlineLarge,
         color = Color.Red.copy(alpha = 0.5F),
     )
