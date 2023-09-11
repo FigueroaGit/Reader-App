@@ -55,7 +55,8 @@ fun ReaderNavigation() {
         }
 
         composable(route = ReaderScreens.ReaderStatsScreen.name) {
-            ReaderStatsScreen(navController = navController)
+            val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
+            ReaderStatsScreen(navController = navController, viewModel = homeScreenViewModel)
         }
 
         val updateName = ReaderScreens.UpdateScreen.name

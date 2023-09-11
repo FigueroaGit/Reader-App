@@ -60,8 +60,7 @@ fun SearchScreen(navController: NavController, viewModel: BookSearchViewModel = 
                 isHomeScreen = false,
                 navController = navController,
             ) {
-                navController.popBackStack()
-                // navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                navController.navigate(ReaderScreens.ReaderHomeScreen.name)
             }
         },
     ) { contentPadding ->

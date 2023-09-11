@@ -313,7 +313,7 @@ fun ListCard(
                         contentDescription = "Favorite Icon",
                         modifier = Modifier.padding(bottom = 1.dp),
                     )
-                    BookRating(score = 3.5)
+                    BookRating(score = book.rating!!)
                 }
             }
             Text(
@@ -328,12 +328,21 @@ fun ListCard(
                 modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.labelMedium,
             )
+
+            val isStartedReading = remember {
+                mutableStateOf(false)
+            }
+
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.padding(start = 110.dp),
             ) {
-                RoundedButton("Reading", radius = 70)
+                isStartedReading.value = book.startedReading != null
+                RoundedButton(
+                    label = if (isStartedReading.value) "Reading" else "Not yet",
+                    radius = 70,
+                )
             }
         }
     }
@@ -391,13 +400,14 @@ fun RatingBar(modifier: Modifier = Modifier, rating: Int, onPressRating: (Int) -
                             onPressRating(i)
                             ratingState = i
                         }
+
                         MotionEvent.ACTION_UP -> {
                             selected = false
                         }
                     }
                     true
                 },
-                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1),
             )
         }
     }
